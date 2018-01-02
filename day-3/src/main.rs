@@ -1,4 +1,5 @@
 use std::io::{Read, self};
+use std::collections::HashMap;
 
 fn main() {
     let mut buffer = String::new();
@@ -15,7 +16,7 @@ fn main() {
     println!("Two: {}", result);
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 struct Point {
     x: i32,
     y: i32,
@@ -29,6 +30,21 @@ impl Point {
             Direction::Up => Point { x: self.x, y: self.y - 1 },
             Direction::Down => Point { x: self.x, y: self.y + 1 },
         }
+    }
+
+    fn surrounding_points(&self) -> Vec<Point> {
+        let mut vec = Vec::new();
+        vec.push(Point { x: self.x - 1, y: self.y - 1 });
+        vec.push(Point { x: self.x - 1, y: self.y     });
+        vec.push(Point { x: self.x - 1, y: self.y + 1 });
+        vec.push(Point { x: self.x    , y: self.y - 1 });
+        vec.push(Point { x: self.x    , y: self.y     });
+        vec.push(Point { x: self.x    , y: self.y + 1 });
+        vec.push(Point { x: self.x + 1, y: self.y - 1 });
+        vec.push(Point { x: self.x + 1, y: self.y     });
+        vec.push(Point { x: self.x + 1, y: self.y + 1 });
+
+        vec
     }
 }
 
@@ -97,6 +113,29 @@ impl Iterator for MoveSequence {
     }
 }
 
+#[derive(Debug)]
+struct CoordinateSequence {
+    point: Point,
+    move_seq: MoveSequence,
+}
+
+fn coordinate_sequence() -> CoordinateSequence {
+    CoordinateSequence { point: Point { x: 0, y: 0 }, move_seq: move_sequence() }
+}
+
+impl Iterator for CoordinateSequence {
+    type Item = Point;
+
+    fn next(&mut self) -> Option<Point> {
+        let p = Point { x: self.point.x, y: self.point.y };
+        let dir = self.move_seq.next().unwrap();
+        let new_point = self.point.move_dir(dir);
+        self.point = new_point;
+
+        Some(p)
+    }
+}
+
 fn manhatten_distance(a : Point, b : Point) -> i32 {
     (a.x - b.x).abs() + (a.y - b.y).abs()
 }
@@ -126,6 +165,31 @@ fn day3a(input : usize) -> i32 {
     manhatten_distance(zero, coord)
 }
 
-fn day3b(_ : usize) -> i32 {
-    0
+fn day3b(input : usize) -> usize {
+    let mut values = HashMap::new();
+    let mut last_value = 0;
+
+    for point in coordinate_sequence().take(input) {
+        if point.x == 0 && point.y == 0 {
+            values.insert(point, 1);
+            last_value = 1;
+        }
+        else {
+            let mut v = 0;
+            for surrounding_point in point.surrounding_points() {
+                v += match values.get(&surrounding_point) {
+                    Some(&number) => number,
+                    _ => 0,
+                }
+            }
+            values.insert(point, v);
+            last_value = v;
+        }
+
+        if last_value > input {
+            return last_value;
+        }
+    }
+
+    last_value
 }
