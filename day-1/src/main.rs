@@ -19,7 +19,7 @@ fn main() {
     println!("Two: {}", result);
 }
 
-fn day1a(input : &Vec<u32>) -> u32 {
+fn day1a(input : &[u32]) -> u32 {
     let mut sum = 0;
 
     for (i, val) in input.iter().enumerate() {
@@ -38,7 +38,7 @@ fn day1a(input : &Vec<u32>) -> u32 {
     sum
 }
 
-fn day1b(input : &Vec<u32>) -> u32 {
+fn day1b(input : &[u32]) -> u32 {
     let mut sum = 0;
 
     for (i, val) in input.iter().enumerate() {
