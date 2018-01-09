@@ -53,14 +53,10 @@ fn main() {
         input
     }).collect();
 
-    println!("{:?}", input);
-
     let result = day8a(&input);
     println!("One: {}", result);
-    /*
-    let result = day6b(&input);
+    let result = day8b(&input);
     println!("Two: {}", result);
-    */
 }
 
 #[derive(Debug)]
@@ -121,11 +117,12 @@ impl fmt::Debug for Instruction {
 #[derive(Debug)]
 struct Processor {
     registers: HashMap<String, i32>,
+    max_value: i32,
 }
 
 impl Processor {
     fn new() -> Processor {
-        Processor { registers: HashMap::new() }
+        Processor { registers: HashMap::new(), max_value: 0 }
     }
 
     fn handle_instruction(&mut self, inst: &Instruction) -> () {
@@ -151,6 +148,10 @@ impl Processor {
                 ChangeDirection::Dec => old_value - inst.modify_amount,
             };
 
+            if self.max_value < new_value {
+                self.max_value = new_value;
+            }
+
             self.registers.insert(inst.modify_register.name.clone(), new_value);
         }
     }
@@ -163,11 +164,7 @@ fn day8a(input: &[Instruction]) -> i32 {
         processor.handle_instruction(inst);
     }
 
-    println!("{:?}", processor);
-
     let registers = processor.registers;
-
-    println!("{:?}", registers);
 
     let mut max = i32::min_value();
     for (_, val) in registers {
@@ -177,4 +174,14 @@ fn day8a(input: &[Instruction]) -> i32 {
     }
     
     max
+}
+
+fn day8b(input: &[Instruction]) -> i32 {
+    let mut processor = Processor::new();
+
+    for inst in input.iter() {
+        processor.handle_instruction(inst);
+    }
+
+    processor.max_value
 }
