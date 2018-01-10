@@ -17,34 +17,22 @@ fn main() {
     println!("Two: {}", result);
 }
 
-fn day15a(a: u64, b: u64) -> u64 {
+fn day15a(a: u64, b: u64) -> usize {
     let a = generator::Generator::new_a(a).to_remainder(65536);
     let b = generator::Generator::new_b(b).to_remainder(65536);
 
     let combined = a.zip(b);
+    let filtered = combined.take(40000000).filter(|&(a, b)| a == b);
 
-    let mut matches = 0;
-    for (a, b) in combined.take(40000000) {
-        if a == b {
-            matches += 1;
-        }
-    }
-
-    matches
+    filtered.count()
 }
 
-fn day15b(a: u64, b: u64) -> u64 {
+fn day15b(a: u64, b: u64) -> usize {
     let a = generator::Generator::new_a(a).filter(|x| x % 4 == 0).to_remainder(65536);
     let b = generator::Generator::new_b(b).filter(|x| x % 8 == 0).to_remainder(65536);
 
     let combined = a.zip(b);
+    let filtered = combined.take(5000000).filter(|&(a, b)| a == b);
 
-    let mut matches = 0;
-    for (a, b) in combined.take(5000000) {
-        if a == b {
-            matches += 1;
-        }
-    }
-
-    matches
+    filtered.count()
 }

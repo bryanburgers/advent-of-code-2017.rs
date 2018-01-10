@@ -45,11 +45,5 @@ fn day9b(input: &str) -> usize {
         _ => false,
     });
 
-    // Is there a good way to get the length of an iter?
-    let mut count = 0;
-    for _ in filtered {
-        count += 1;
-    }
-
-    count
+    filtered.count()
 }
